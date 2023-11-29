@@ -3,10 +3,11 @@ import { fileToBase64 } from "~/lib/base64"
 
 export default defineComponent({
   data: () => ({
-    image: null as File | null,
+    image: undefined as File | undefined,
   }),
   methods: {
     async onSubmit() {
+      if (!this.image) return
       const base64image = await fileToBase64(this.image)
       const res = await $fetch("/api/upload", {
         method: "POST",
@@ -22,7 +23,11 @@ export default defineComponent({
 
 <template>
   <form @submit.prevent="onSubmit">
-    <input type="file" accept="image/jpeg" @change="this.image = $event.target.files[0]" />
+    <input
+      type="file"
+      accept="image/jpeg"
+      @change="image = ($event.target as HTMLInputElement)?.files?.[0]"
+    />
     <button type="submit">Submit</button>
   </form>
 </template>
